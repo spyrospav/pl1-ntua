@@ -5,9 +5,8 @@
 
 using namespace std;
 
-int seq[1000001];
+int seq[1000000];
 int freq[100001];
-int rev_freq[100000];
 
 int main(int argc, char const *argv[]) {
 
