@@ -10,19 +10,20 @@ int freq[100001];
 
 int main(int argc, char const *argv[]) {
 
-  int N,K;
-  cin >> N >> K;
+  ifstream fin(argv[1]);
+  int N, K;
+  fin >> N >> K;
 
-  for(int i=0; i<N; i++){
-    cin >> seq[i];
+  for(int i = 0; i < N; i++){
+    fin >> seq[i];
     freq[seq[i]]++;
   }
 
-  bool impossible=false;
+  bool impossible = false;
 
-  for(int i=1; i<=K; i++){
+  for(int i = 1; i <= K; i++){
     if(!freq[i]){
-      impossible=true;
+      impossible = true;
       break;
     }
   }
@@ -33,20 +34,18 @@ int main(int argc, char const *argv[]) {
 
   else{
 
-    int start=0,finish=N-1;
+    int start = 0, finish = N-1;
 
-    while (start<=finish){
-      if (freq[seq[start]]==1 && freq[seq[finish]]==1){
+    while (start <= finish){
+      if (freq[seq[start]] == 1 && freq[seq[finish]] == 1){
         break;
       }
       else{
-        if (freq[seq[start]]>1){
-          //cout << "start : " << start << endl;
+        if (freq[seq[start]] > 1){
           freq[seq[start]]--;
           start++;
         }
-        if (freq[seq[finish]]>1){
-          //cout << "finish : " << finish << endl;
+        if (freq[seq[finish]] > 1){
           freq[seq[finish]]--;
           finish--;
         }
