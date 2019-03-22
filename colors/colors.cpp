@@ -37,22 +37,21 @@ int main(int argc, char const *argv[]) {
     int start = 0, finish = N-1;
 
     while (start <= finish){
-      if (freq[seq[start]] == 1 && freq[seq[finish]] == 1){
+
+      if (freq[seq[start]] == 1 && freq[seq[finish]] == 1)
         break;
-      }
-      else{
-        if (freq[seq[start]] > 1){
-          freq[seq[start]]--;
-          start++;
-        }
-        if (freq[seq[finish]] > 1){
-          freq[seq[finish]]--;
-          finish--;
-        }
+
+      else {
+        if (freq[seq[start]] > 1)
+          freq[seq[start++]]--;
+
+        if (freq[seq[finish]] > 1)
+          freq[seq[finish--]]--;
       }
     }
 
     cout << finish-start+1 << endl;
   }
+
   return 0;
 }
