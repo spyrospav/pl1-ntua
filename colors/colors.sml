@@ -22,37 +22,52 @@ structure M = BinaryMapFn(
     end
 );
 
-(*val colors file =*)
-    (*val p = parse file*)
+(*create test case 1 !!!!!!*)
 val p = parse "a1.txt";
 val N = #1 p;
 val K = #2 p;
 val l = #3 p;
-val k = M.empty;
+val rev_l = rev(l);
+val length_l = length l;
+(* Control.Print.printDepth := 20; best command for SML*)
+fun createBM (k,a,s) =
+     if k = 1 then M.insert(a,1,s)
+     else createBM(k-1,M.insert(a,k,s),s);
 
-(*
-list - reverse list
-  i  -      j
-fun where we check head list then lookup at M, if 1 somehow we return (maybe an acc to act as flag)
-else remove from M and insert h[i]--, same with j
-*)
-
-(*fun createBM (l,a) =
-    if l nil then a
+fun updateBM (l,a) =
+    if l = [] then a
     else
         let
-            val j = hd l;
+            val x = (#2 (M.remove(a,hd l)))+1
         in
-            if M.lookup(a,j) then
-            createBM(tl,M.insert(a,j,  );
-        end
-*)
+            updateBM(tl l, M.insert(a,hd l,x))
+        end;
 
-val tree = createBM(l,k)
-(*fun that does a[b]-- *)
-fun g (a,b) =
+fun decrease (a,b) =
     let
         val j = #2 (M.remove(a,b))
     in
         M.insert(a,b,j-1)
     end;
+
+val new_tree = updateBM (l,createBM(K,M.empty,0));
+
+fun check_for_solution (a,k) =
+    if k >0 then (
+        if Option.valOf(M.find(a,k)) > 0 then check_for_solution (a,k-1)
+        else false
+        )
+    else
+        true;
+
+val flag = check_for_solution (new_tree,K);
+
+(*
+fun solve (l, l_back, a, acc) =
+    let
+        val x = hd l
+        val y = hd l_back
+    in
+        x+y
+    end;
+*)
