@@ -22,14 +22,6 @@ structure M = BinaryMapFn(
     end
 );
 
-(*create test case 1 !!!!!!*)
-val p = parse "a1.txt";
-val N = #1 p;
-val K = #2 p;
-val l = #3 p;
-val rev_l = rev(l);
-val length_l = length l;
-(* Control.Print.printDepth := 20; best command for SML*)
 fun createBM (k,a,s) =
      if k = 1 then M.insert(a,1,s)
      else createBM(k-1,M.insert(a,k,s),s);
@@ -50,24 +42,34 @@ fun decrease (a,b) =
         M.insert(a,b,j-1)
     end;
 
-val new_tree = updateBM (l,createBM(K,M.empty,0));
-
 fun check_for_solution (a,k) =
-    if k >0 then (
+    if k > 0 then (
         if Option.valOf(M.find(a,k)) > 0 then check_for_solution (a,k-1)
         else false
         )
     else
         true;
 
-val flag = check_for_solution (new_tree,K);
+fun solve (l,l_back,a,acc,flag) =
+    if flag = true
+        then (if Option.valOf(M.find(a, hd l)) = 1 then acc
+                else solve (tl l, l_back, decrease(a,hd l), acc+1, true) )
+    else(
+        if Option.valOf(M.find(a, hd l)) = 1 then solve (l_back,tl l, a, acc+1, true)
+        else
+            solve (l_back, tl l, decrease(a, hd l), acc+1, false)
+        );
 
-(*
-fun solve (l, l_back, a, acc) =
-    let
-        val x = hd l
-        val y = hd l_back
-    in
-        x+y
-    end;
-*)
+fun solution (l, a, possible, N) =
+    if possible = true
+        then N - solve (l, rev(l), a, 0, false) + 1
+    else 0;
+
+(* Control.Print.printDepth := 20; best command for SML*)
+val p = parse "a7.txt";
+val N = #1 p;
+val K = #2 p;
+val l = #3 p;
+val new_tree = updateBM (l,createBM(K,M.empty,0));
+
+print ((Int.toString (solution(l,new_tree,check_for_solution(new_tree,K),N))) ^ "\n");
