@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <algorithm>
 #include <string>
@@ -6,18 +7,19 @@
 
 using namespace std;
 
-struct Grid {
-    int death_time = -1;
-    int cat_time = -1;
+struct Grid{
+    int death_time=-1;
+    int cat_time=-1;
     char symbol;
     string seq;
-    bool visited = false;
-    bool cat_visit = false;
+    bool visited=false;
+    bool cat_visit=false;
 };
 
 Grid grid[1000][1000];
 
-struct  cell {
+
+struct cell{
   int row;
   int column;
   int t;
@@ -31,125 +33,113 @@ int main(int argc, char const *argv[]) {
   queue<cell> cat;
   queue<cell> solutions;
 
-  int N = 0, M = 0, maxM = 0;
+  int N=0, M=0, maxM=0;
   char a;
-  while(fin.get(a)) {
-      grid[N][M].symbol = a;
-      if(a == '\n') {
-        maxM = M;
-        M = 0;
+  while(fin.get(a)){
+
+      grid[N][M].symbol=a;
+      if(a=='\n'){
+        maxM=M;
+        M=0;
         N++;
       }
-      else if(a == 'W') {
-        cell c = {N, M, 0};
-        q.push(c);
-        grid[N][M].death_time = 0;
-        grid[N][M].visited = true;
+
+      else{
+
+        if(a=='W'){
+          cell c={N,M,0};
+          q.push(c);
+          grid[N][M].death_time=0;
+          grid[N][M].visited=true;
+        }
+
+        else if(a=='X')
+          grid[N][M].symbol=a;
+
+        else if(a=='A'){
+          grid[N][M].symbol='.';
+          grid[N][M].cat_time=0;
+          grid[N][M].seq="s";
+          grid[N][M].cat_visit=true;
+          cell c={N,M,0};
+          cat.push(c);
+        }
+
+        M++;
       }
-      else if(a == 'X') {
-        grid[N][M].symbol = a;
-      }
-      else if(a == 'A') {
-        grid[N][M].symbol = '.';
-        grid[N][M].cat_time = 0;
-        grid[N][M].seq = "s";
-        grid[N][M].cat_visit = true;
-        cell c = {N, M, 0};
-        cat.push(c);
-      }
-      M++;
   }
 
+  M=maxM;
 
-  M = maxM;
-  int max_time = 0;
+  int max_time=0;
 
-  while(q.size()) {
+  while(q.size()){
 
-    struct cell a = q.front(); q.pop();
-    max_time = a.t;
+    struct cell a=q.front();
+    max_time=a.t;
 
-    if(a.row > 0) {
-      Grid upCell = grid[a.row-1][a.column];
-      if(upCell.symbol == '.' && !upCell.visited) {
-        upCell.death_time = a.t + 1;
-        upCell.visited = true;
-        q.push(cell{a.row-1, a.column, a.t+1});
-      }
+    if(a.row > 0 && grid[a.row-1][a.column].symbol=='.' && !grid[a.row-1][a.column].visited){
+      grid[a.row-1][a.column].death_time=a.t+1;
+      grid[a.row-1][a.column].visited=true;
+      q.push(cell{a.row-1,a.column,a.t+1});
     }
 
-    if(a.row < N-1) {
-      Grid downCell = grid[a.row+1][a.column];
-      if (downCell.symbol == '.' && !downCell.visited) {
-        downCell.death_time = a.t + 1;
-        downCell.visited = true;
-        q.push(cell{a.row+1, a.column, a.t+1});
-      }
+    if(a.row < N-1 && grid[a.row+1][a.column].symbol=='.' && !grid[a.row+1][a.column].visited){
+      grid[a.row+1][a.column].death_time=a.t+1;
+      grid[a.row+1][a.column].visited=true;
+      q.push(cell{a.row+1,a.column,a.t+1});
     }
 
-    if(a.column > 0) {
-      Grid leftCell = grid[a.row][a.column-1];
-      if (leftCell.symbol=='.' && !leftCell.visited) {
-        leftCell.death_time = a.t + 1;
-        leftCell.visited = true;
-        q.push(cell{a.row, a.column-1, a.t+1});
-      }
+    if(a.column > 0 && grid[a.row][a.column-1].symbol=='.' && !grid[a.row][a.column-1].visited){
+      grid[a.row][a.column-1].death_time=a.t+1;
+      grid[a.row][a.column-1].visited=true;
+      q.push(cell{a.row,a.column-1,a.t+1});
     }
 
-    if(a.column < M-1) {
-      Grid rightCell = grid[a.row][a.column+1];
-      if (rightCell.symbol == '.' && !rightCell.visited) {
-        rightCell.death_time = a.t + 1;
-        rightCell.visited = true;
-        q.push(cell{a.row, a.column+1, a.t+1});
-      }
+    if(a.column < M-1 && grid[a.row][a.column+1].symbol=='.' && !grid[a.row][a.column+1].visited){
+      grid[a.row][a.column+1].death_time=a.t+1;
+      grid[a.row][a.column+1].visited=true;
+      q.push(cell{a.row,a.column+1,a.t+1});
     }
+
+    q.pop();
+
   }
 
-  while(cat.size()) {
+  while(cat.size()){
 
-    struct cell a = cat.front(); cat.pop();
-    Grid currentCell = grid[a.row][a.column];
+    struct cell a=cat.front();
 
-    if (a.row < N-1) {
-      Grid downCell = grid[a.row+1][a.column];
-      if (downCell.symbol == '.' && !downCell.cat_visit) {
-        downCell.cat_time = a.t + 1;
-        downCell.cat_visit = true;
-        downCell.seq = currentCell.seq + 'D';
-        cat.push(cell{a.row+1, a.column, a.t+1});
-      }
+    if (a.row < N-1 && grid[a.row+1][a.column].symbol=='.' && !grid[a.row+1][a.column].cat_visit){
+      grid[a.row+1][a.column].cat_time=a.t+1;
+      grid[a.row+1][a.column].cat_visit=true;
+      grid[a.row+1][a.column].seq=grid[a.row][a.column].seq+'D';
+      cat.push(cell{a.row+1,a.column,a.t+1});
     }
 
-    if (a.column > 0) {
-      Grid leftCell = grid[a.row][a.column-1];
-      if(leftCell.symbol == '.' && !leftCell.cat_visit) {
-        leftCell].cat_time = a.t + 1;
-        leftCell.cat_visit = true;
-        leftCell.seq = currentCell.seq + 'L';
-        cat.push(cell{a.row, a.column-1, a.t+1});
-      }
+    if (a.column > 0 && grid[a.row][a.column-1].symbol=='.' && !grid[a.row][a.column-1].cat_visit){
+      grid[a.row][a.column-1].cat_time=a.t+1;
+      grid[a.row][a.column-1].cat_visit=true;
+      grid[a.row][a.column-1].seq=grid[a.row][a.column].seq+'L';
+      cat.push(cell{a.row,a.column-1,a.t+1});
     }
 
-    if (a.column < M-1) {
-      Grid rightCell = grid[a.row][a.column+1];
-      if (rightCell.symbol == '.' && !rightCell.cat_visit) {
-        rightCell.cat_time = a.t + 1;
-        rightCell.cat_visit = true;
-        rightCell.seq = currentCell.seq + 'R';
-        cat.push(cell{a.row, a.column+1, a.t+1});
-      }
+    if (a.column < M-1 && grid[a.row][a.column+1].symbol=='.' && !grid[a.row][a.column+1].cat_visit){
+      grid[a.row][a.column+1].cat_time=a.t+1;
+      grid[a.row][a.column+1].cat_visit=true;
+      grid[a.row][a.column+1].seq=grid[a.row][a.column].seq+'R';
+      cat.push(cell{a.row,a.column+1,a.t+1});
     }
 
-    if (a.row > 0) {
-      Grid upCell = grid[a.row-1][a.column];
-      if(upCell.symbol == '.' && !upCell.cat_visit) {
-        upCell.cat_time = a.t + 1;
-        upCell.cat_visit = true;
-        upCell.seq = currentCell.seq + 'U';
-        cat.push(cell{a.row-1, a.column, a.t+1});
-      }
+    if (a.row > 0 && grid[a.row-1][a.column].symbol=='.' && !grid[a.row-1][a.column].cat_visit){
+      grid[a.row-1][a.column].cat_time=a.t+1;
+      grid[a.row-1][a.column].cat_visit=true;
+      grid[a.row-1][a.column].seq=grid[a.row][a.column].seq+'U';
+      cat.push(cell{a.row-1,a.column,a.t+1});
     }
+
+    cat.pop();
+
   }
 
   for(int i=0; i<N; i++){
@@ -163,7 +153,7 @@ int main(int argc, char const *argv[]) {
     }
   }
 
-  cell best_sol = solutions.front();
+  cell best_sol=solutions.front();
 
   solutions.pop();
   while(solutions.size()){
