@@ -1,17 +1,18 @@
 local
+
+    fun min (a, b) = if a < b then a else b;
+
     fun parse file =
         let
-            fun readInt input =
-                Option.valOf (TextIO.scanStream (Int.scan StringCvt.DEC) input)
+            fun readInt input = Option.valOf (TextIO.scanStream (Int.scan StringCvt.DEC) input)
+            val inStream = TextIO.openIn file
 
-                val inStream = TextIO.openIn file
+            val n = readInt inStream
+            val k = readInt inStream
+            val _ = TextIO.inputLine inStream
 
-                val n = readInt inStream
-                val k = readInt inStream
-                val _ = TextIO.inputLine inStream
-
-                fun readInts 0 acc = acc
-                  | readInts i acc = readInts (i-1) (readInt inStream:: acc)
+            fun readInts 0 acc = acc
+              | readInts i acc = readInts (i-1) (readInt inStream:: acc)
         in
             (n, k, rev(readInts n []))
         end;
@@ -33,8 +34,15 @@ local
             let
                 val x = (#2 (M.remove(a,hd l)))+1
             in
-                updateBM(tl l, M.insert(a,hd l,x))
-            end;
+            updateBM(tl l, M.insert(a,hd l,x))
+        end;
+
+    fun increase (a,b) =
+        let
+            val j = #2 (M.remove(a,b))
+        in
+            M.insert(a,b,j+1)
+        end;
 
     fun decrease (a,b) =
         let
@@ -43,28 +51,28 @@ local
             M.insert(a,b,j-1)
         end;
 
-    fun check_for_solution (a,k) =
-        if k > 0 then (
-            if Option.valOf(M.find(a,k)) > 0 then check_for_solution (a,k-1)
-            else false
-            )
-        else
-            true;
+    fun check (a,x) = Option.valOf(M.find(a,x))
 
-    fun solve (l,l_back,a,acc,flag) =
-        if flag = true then(
-            if Option.valOf(M.find(a, hd l)) = 1 then acc
-            else solve (tl l, l_back, decrease(a,hd l), acc+1, true)
+    fun help_solve_a (count, k, t, l1, j, l2, i, ans, n) =
+        if count < k then(
+            if check(t, hd (tl l1)) = 0 then help_solve_b(count+1, k, increase(t, hd (tl l1)), tl l1, j+1, l2, i, ans, n)
+            else help_solve_b(count, k, increase(t, hd (tl l1)), tl l1, j+1, l2, i, ans, n)
         )
-        else(
-            if Option.valOf(M.find(a, hd l)) = 1 then solve (l_back,tl l, a, acc+1, true)
-            else solve (l_back, tl l, decrease(a, hd l), acc+1, false)
-        );
+        else help_solve_b (count, k, t, l1, j, l2, i, ans, n)
 
-    fun solution (l, a, possible, N) =
-        if possible = true
-            then N - solve (l, rev(l), a, 0, false) + 1
-        else 0;
+    and help_solve_b (count, k, t, l1, j, l2, i, ans, n) =
+        if count = k then (
+            if (check(t,hd l2) > 1 andalso i<j) then help_solve_b(count, k, decrease(t, hd l2), l1, j, tl l2, i+1, ans, n)
+            else solve(decrease(t,hd l2), j, l1, n, k, min (ans, j-i+1), i+1, tl l2, count-1)
+            )
+        else solve(t, j, l1, n, k, ans, i, l2, count)
+
+    and solve (t,j,l1,n,k,ans,i,l2,count) =
+        if j < n-1 then help_solve_a(count, k, t, l1, j, l2, i, ans, n)
+        else ans
+
+    fun solution (a,n) = if a <= n then a else 0
+
 in
     fun colors file_name=
         let
@@ -72,9 +80,8 @@ in
             val N = #1 p
             val K = #2 p
             val l = #3 p
-            val new_tree = updateBM (l,createBM(K,M.empty,0))
+            val new_tree = increase(createBM(K,M.empty,0),hd l)
         in
-            print ((Int.toString (solution(l,new_tree,check_for_solution(new_tree,K),N))) ^ "\n")
+            print ((Int.toString (solution(solve(new_tree, 0, l, N, K, N+1, 0, l, 1), N))) ^ "\n")
         end;
 end
-(* Control.Print.printDepth := 20; best command for SML*)
