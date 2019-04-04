@@ -1,6 +1,6 @@
 local
 
-    fun min (a, b) = if a < b then a else b;
+    fun min a b = if a < b then a else b
 
     fun parse file =
         let
@@ -63,7 +63,7 @@ local
     and help_solve_b (count, k, t, l1, j, l2, i, ans, n) =
         if count = k then (
             if (check(t,hd l2) > 1 andalso i<j) then help_solve_b(count, k, decrease(t, hd l2), l1, j, tl l2, i+1, ans, n)
-            else solve(decrease(t,hd l2), j, l1, n, k, min (ans, j-i+1), i+1, tl l2, count-1)
+            else solve(decrease(t,hd l2), j, l1, n, k, (min ans (j-i+1)), i+1, tl l2, count-1)
             )
         else solve(t, j, l1, n, k, ans, i, l2, count)
 
