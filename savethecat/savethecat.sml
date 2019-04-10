@@ -174,19 +174,16 @@ fun findAnswerCell ((acc:node), (x:node)) =
       val (i1, j1, waterTime1, catTime1, catMove1) = x
       val (i2, j2, waterTime2, catTime2, catMove2) = acc
     in
-      if catTime1 <> ~1 then
-        if waterTime1 = ~1 then
-          if waterTime2 = ~1 then
-            if (upLeft i1 j1 i2 j2) then x
-            else acc
-          else x
-        else if waterTime2 = ~1 then acc
-        else if (waterTime1 > waterTime2) then x
-        else if (waterTime2 > waterTime1) then acc
-        else if (upLeft i1 j1 i2 j2) then x
-        else acc
-      else
-        acc
+      if waterTime1 = ~1 then
+        if waterTime2 = ~1 then
+          if (upLeft i1 j1 i2 j2) then x
+          else acc
+        else x
+      else if waterTime2 = ~1 then acc
+      else if (waterTime1 > waterTime2) then x
+      else if (waterTime2 > waterTime1) then acc
+      else if (upLeft i1 j1 i2 j2) then x
+      else acc
     end;
 
 (* from final cell return the time we save the cat *)
@@ -232,8 +229,12 @@ fun savethecat file_name =
       val updatedTree = catBFS (waterBFS initTree)
 
       val dummyCell = (1042, 1042, ~42, ~42, "")
-      val ans = M.foldl findAnswerCell dummyCell updatedTree
+      (*get cells visited by cat *)
+      val filteredTree = M.filter (fn x => (#4 x) <> ~1) updatedTree
+      val ans = M.foldl findAnswerCell dummyCell filteredTree
+
       val path = getPath (#1 ans, #2 ans, #5 ans) updatedTree ""
+
     in
      print((getTime ans)  ^ "\n" ^ path ^ "\n")
     end;
