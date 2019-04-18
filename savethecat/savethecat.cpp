@@ -11,8 +11,8 @@ struct Grid{
     int death_time=-1;
     int cat_time=-1;
     char symbol;
-    string seq;
-    //pair<int, int> prev_cell;
+    char move= (char) 0;
+    //string seq;
 };
 
 Grid grid[1000][1000];
@@ -22,6 +22,21 @@ struct cell{
   int column;
   int t;
 };
+
+string print(cell a){
+    cell b={0,0,0};
+    if(grid[a.row][a.column].move == 'U')
+        b={a.row+1,a.column,1};
+    else if(grid[a.row][a.column].move == 'D')
+        b={a.row-1,a.column,1};
+    else if(grid[a.row][a.column].move == 'L')
+        b={a.row,a.column+1,1};
+    else if(grid[a.row][a.column].move =='R')
+        b={a.row,a.column-1,1};
+    else if(grid[a.row][a.column].move == (char) 0)
+        return "";
+    return print(b)+grid[a.row][a.column].move;
+}
 
 int main(int argc, char const *argv[]) {
 
@@ -56,7 +71,8 @@ int main(int argc, char const *argv[]) {
         else if(a=='A'){
           grid[N][M].symbol='.';
           grid[N][M].cat_time=0;
-          grid[N][M].seq="s";
+          //grid[N][M].seq="s";
+          grid[N][M].move= (char) 0;
           cell c={N,M,0};
           cat.push(c);
         }
@@ -105,7 +121,8 @@ int main(int argc, char const *argv[]) {
     if (a.row < N-1 && grid[a.row+1][a.column].symbol=='.' && grid[a.row+1][a.column].cat_time==-1){
         if (grid[a.row+1][a.column].death_time>a.t+1 || grid[a.row+1][a.column].death_time==-1){
             grid[a.row+1][a.column].cat_time=a.t+1;
-            grid[a.row+1][a.column].seq=grid[a.row][a.column].seq+'D';
+            //grid[a.row+1][a.column].seq=grid[a.row][a.column].seq+'D';
+            grid[a.row+1][a.column].move='D';
             cat.push(cell{a.row+1,a.column,a.t+1});
         }
     }
@@ -113,7 +130,8 @@ int main(int argc, char const *argv[]) {
     if (a.column > 0 && grid[a.row][a.column-1].symbol=='.' && grid[a.row][a.column-1].cat_time==-1){
         if (grid[a.row][a.column-1].death_time>a.t+1 || grid[a.row][a.column-1].death_time==-1){
             grid[a.row][a.column-1].cat_time=a.t+1;
-            grid[a.row][a.column-1].seq=grid[a.row][a.column].seq+'L';
+            //grid[a.row][a.column-1].seq=grid[a.row][a.column].seq+'L';
+            grid[a.row][a.column-1].move='L';
             cat.push(cell{a.row,a.column-1,a.t+1});
         }
     }
@@ -121,7 +139,8 @@ int main(int argc, char const *argv[]) {
     if (a.column < M-1 && grid[a.row][a.column+1].symbol=='.' && grid[a.row][a.column+1].cat_time==-1){
         if (grid[a.row][a.column+1].death_time>a.t+1 || grid[a.row][a.column+1].death_time==-1){
             grid[a.row][a.column+1].cat_time=a.t+1;
-            grid[a.row][a.column+1].seq=grid[a.row][a.column].seq+'R';
+            //grid[a.row][a.column+1].seq=grid[a.row][a.column].seq+'R';
+            grid[a.row][a.column+1].move='R';
             cat.push(cell{a.row,a.column+1,a.t+1});
         }
     }
@@ -129,7 +148,8 @@ int main(int argc, char const *argv[]) {
     if (a.row > 0 && grid[a.row-1][a.column].symbol=='.' && grid[a.row-1][a.column].cat_time==-1){
         if (grid[a.row-1][a.column].death_time>a.t+1 || grid[a.row-1][a.column].death_time==-1){
             grid[a.row-1][a.column].cat_time=a.t+1;
-            grid[a.row-1][a.column].seq=grid[a.row][a.column].seq+'U';
+            //grid[a.row-1][a.column].seq=grid[a.row][a.column].seq+'U';
+            grid[a.row-1][a.column].move='U';
             cat.push(cell{a.row-1,a.column,a.t+1});
         }
     }
@@ -177,12 +197,15 @@ int main(int argc, char const *argv[]) {
       cout << best_sol.t << endl;
   }
 
-  if(grid[best_sol.row][best_sol.column].seq == "s"){
+  //if(grid[best_sol.row][best_sol.column].seq == "s")
+  if(grid[best_sol.row][best_sol.column].move == (char) 0){
       cout << "stay" << endl;
   }
   else{
-      grid[best_sol.row][best_sol.column].seq.erase(0,1);
-      cout << grid[best_sol.row][best_sol.column].seq << endl;
+      string s=print(best_sol);
+      //grid[best_sol.row][best_sol.column].seq.erase(0,1);
+      //cout << grid[best_sol.row][best_sol.column].seq << endl;
+      cout << s << endl;
   }
 
   return 0;
