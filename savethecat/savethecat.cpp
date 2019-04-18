@@ -12,12 +12,10 @@ struct Grid{
     int cat_time=-1;
     char symbol;
     string seq;
-    bool visited=false;
-    bool cat_visit=false;
+    //pair<int, int> prev_cell;
 };
 
 Grid grid[1000][1000];
-
 
 struct cell{
   int row;
@@ -50,7 +48,6 @@ int main(int argc, char const *argv[]) {
           cell c={N,M,0};
           q.push(c);
           grid[N][M].death_time=0;
-          grid[N][M].visited=true;
         }
 
         else if(a=='X')
@@ -60,7 +57,6 @@ int main(int argc, char const *argv[]) {
           grid[N][M].symbol='.';
           grid[N][M].cat_time=0;
           grid[N][M].seq="s";
-          grid[N][M].cat_visit=true;
           cell c={N,M,0};
           cat.push(c);
         }
@@ -78,27 +74,23 @@ int main(int argc, char const *argv[]) {
     struct cell a=q.front();
     max_time=a.t;
 
-    if(a.row > 0 && grid[a.row-1][a.column].symbol=='.' && !grid[a.row-1][a.column].visited){
+    if(a.row > 0 && grid[a.row-1][a.column].symbol=='.' && grid[a.row-1][a.column].death_time==-1){
       grid[a.row-1][a.column].death_time=a.t+1;
-      grid[a.row-1][a.column].visited=true;
       q.push(cell{a.row-1,a.column,a.t+1});
     }
 
-    if(a.row < N-1 && grid[a.row+1][a.column].symbol=='.' && !grid[a.row+1][a.column].visited){
+    if(a.row < N-1 && grid[a.row+1][a.column].symbol=='.' && grid[a.row+1][a.column].death_time==-1){
       grid[a.row+1][a.column].death_time=a.t+1;
-      grid[a.row+1][a.column].visited=true;
       q.push(cell{a.row+1,a.column,a.t+1});
     }
 
-    if(a.column > 0 && grid[a.row][a.column-1].symbol=='.' && !grid[a.row][a.column-1].visited){
+    if(a.column > 0 && grid[a.row][a.column-1].symbol=='.' && grid[a.row][a.column-1].death_time==-1){
       grid[a.row][a.column-1].death_time=a.t+1;
-      grid[a.row][a.column-1].visited=true;
       q.push(cell{a.row,a.column-1,a.t+1});
     }
 
-    if(a.column < M-1 && grid[a.row][a.column+1].symbol=='.' && !grid[a.row][a.column+1].visited){
+    if(a.column < M-1 && grid[a.row][a.column+1].symbol=='.' && grid[a.row][a.column+1].death_time==-1){
       grid[a.row][a.column+1].death_time=a.t+1;
-      grid[a.row][a.column+1].visited=true;
       q.push(cell{a.row,a.column+1,a.t+1});
     }
 
@@ -110,32 +102,36 @@ int main(int argc, char const *argv[]) {
 
     struct cell a=cat.front();
 
-    if (a.row < N-1 && grid[a.row+1][a.column].symbol=='.' && !grid[a.row+1][a.column].cat_visit){
-      grid[a.row+1][a.column].cat_time=a.t+1;
-      grid[a.row+1][a.column].cat_visit=true;
-      grid[a.row+1][a.column].seq=grid[a.row][a.column].seq+'D';
-      cat.push(cell{a.row+1,a.column,a.t+1});
+    if (a.row < N-1 && grid[a.row+1][a.column].symbol=='.' && grid[a.row+1][a.column].cat_time==-1){
+        if (grid[a.row+1][a.column].death_time>a.t+1 || grid[a.row+1][a.column].death_time==-1){
+            grid[a.row+1][a.column].cat_time=a.t+1;
+            grid[a.row+1][a.column].seq=grid[a.row][a.column].seq+'D';
+            cat.push(cell{a.row+1,a.column,a.t+1});
+        }
     }
 
-    if (a.column > 0 && grid[a.row][a.column-1].symbol=='.' && !grid[a.row][a.column-1].cat_visit){
-      grid[a.row][a.column-1].cat_time=a.t+1;
-      grid[a.row][a.column-1].cat_visit=true;
-      grid[a.row][a.column-1].seq=grid[a.row][a.column].seq+'L';
-      cat.push(cell{a.row,a.column-1,a.t+1});
+    if (a.column > 0 && grid[a.row][a.column-1].symbol=='.' && grid[a.row][a.column-1].cat_time==-1){
+        if (grid[a.row][a.column-1].death_time>a.t+1 || grid[a.row][a.column-1].death_time==-1){
+            grid[a.row][a.column-1].cat_time=a.t+1;
+            grid[a.row][a.column-1].seq=grid[a.row][a.column].seq+'L';
+            cat.push(cell{a.row,a.column-1,a.t+1});
+        }
     }
 
-    if (a.column < M-1 && grid[a.row][a.column+1].symbol=='.' && !grid[a.row][a.column+1].cat_visit){
-      grid[a.row][a.column+1].cat_time=a.t+1;
-      grid[a.row][a.column+1].cat_visit=true;
-      grid[a.row][a.column+1].seq=grid[a.row][a.column].seq+'R';
-      cat.push(cell{a.row,a.column+1,a.t+1});
+    if (a.column < M-1 && grid[a.row][a.column+1].symbol=='.' && grid[a.row][a.column+1].cat_time==-1){
+        if (grid[a.row][a.column+1].death_time>a.t+1 || grid[a.row][a.column+1].death_time==-1){
+            grid[a.row][a.column+1].cat_time=a.t+1;
+            grid[a.row][a.column+1].seq=grid[a.row][a.column].seq+'R';
+            cat.push(cell{a.row,a.column+1,a.t+1});
+        }
     }
 
-    if (a.row > 0 && grid[a.row-1][a.column].symbol=='.' && !grid[a.row-1][a.column].cat_visit){
-      grid[a.row-1][a.column].cat_time=a.t+1;
-      grid[a.row-1][a.column].cat_visit=true;
-      grid[a.row-1][a.column].seq=grid[a.row][a.column].seq+'U';
-      cat.push(cell{a.row-1,a.column,a.t+1});
+    if (a.row > 0 && grid[a.row-1][a.column].symbol=='.' && grid[a.row-1][a.column].cat_time==-1){
+        if (grid[a.row-1][a.column].death_time>a.t+1 || grid[a.row-1][a.column].death_time==-1){
+            grid[a.row-1][a.column].cat_time=a.t+1;
+            grid[a.row-1][a.column].seq=grid[a.row][a.column].seq+'U';
+            cat.push(cell{a.row-1,a.column,a.t+1});
+        }
     }
 
     cat.pop();
