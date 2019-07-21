@@ -47,7 +47,7 @@ public class ZtallocState implements State {
     return sb.toString();
   }
 
-  // Two states are equal if all four are on the same shore.
+  // Two states are equal if they represent the same interval [L,R]
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -56,7 +56,7 @@ public class ZtallocState implements State {
     return L == other.L && R == other.R;
   }
 
-  // Hashing: consider only the positions of the four players.
+  // Hashing: consider only the interval
   @Override
   public int hashCode() {
     return Objects.hash(L, R);
