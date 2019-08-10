@@ -1,15 +1,14 @@
-fun pow(x,y) = if y = 0 then 1 else x * (pow(x,(y-1)));
 
-fun  powm_help (_,0,c:IntInf.int,_) = LargeInt.toInt c
-	| powm_help (base,exponent,c:IntInf.int,modulus) = 
+fun  powm_help (_,0,c:IntInf.int,_) = c
+	| powm_help (base:IntInf.int,exponent,c:IntInf.int,modulus) = 
 		let
-			val x = (c*Int.toLarge(base)) mod modulus;
+			val x = (c*base) mod modulus;
 		in
 			powm_help (base, (exponent-1), x, modulus)
 		end;
 		
 fun powm (_,_,1) = 0
-	| powm (base,exponent,modulus) = powm_help(base,exponent,1,modulus);
+	| powm (base,exponent,modulus) = powm_help(LargeInt.fromInt base,exponent,LargeInt.fromInt 1,modulus);
 
 fun helper [] = []
 	| helper [x] = [x]
@@ -88,27 +87,27 @@ fun build_trie [] acc = acc
 			build_trie (tl Q) (trie_insert q acc)
 		end
 
-fun query_trie _ (Node(_,V,[])) Depth = ((V mod 1000000007) * (powm(2,Depth,1000000007)-1)mod 1000000007) mod 1000000007
+fun query_trie _ (Node(_,V,[])) Depth = (((LargeInt.fromInt V) mod 1000000007) * (powm(2,Depth,1000000007)-1) mod 1000000007) mod 1000000007
 	| query_trie X (Node(_,_,SubTries)) 0 = 
 	let
 		val k = hd X;
 		val y = findChild k SubTries;
 		val key = getTrieKey y;
 	in
-		if key = #"x" then 0
+		if key = #"x" then LargeInt.fromInt 0
 		else query_trie (tl X) y 1
 	end
 	| query_trie X (Node(_,V,SubTries)) Depth = 
 		let 
-			val VV = LargeInt.fromInt(V);
 			val k = hd X;
 			val y = findChild k SubTries;
 			val key = getTrieKey y;
 			val value = getTrieValue y;
-			val Power = ((powm(2,Depth,1000000007) mod 1000000007) -1)  mod 1000000007;
+			val Power = (powm(2,Depth,1000000007)-1)  mod 1000000007;
+			val VV = LargeInt.fromInt (V-value);
 		in
-			if key = #"x" then  (V * Power) mod 1000000007
-			else (((((V-value) mod 1000000007)*(Power mod 1000000007)) mod 1000000007) + (((query_trie (tl X) y (Depth+1)) mod 1000000007 )  mod 1000000007))mod 1000000007
+			if key = #"x" then  ( (LargeInt.fromInt V) mod 1000000007 * Power) mod 1000000007
+			else (((((VV mod 1000000007)*Power) mod 1000000007) mod 1000000007) + (((query_trie (tl X) y (Depth+1)) mod 1000000007 )) )mod 1000000007
 		end
 
 
@@ -126,7 +125,7 @@ fun query_tickets [X] Trie =
 			val qq = explode(X);
 			val q = tl qq;
 			val lottery_numbers = getNum (hd q) Trie;
-			val money = query_trie q Trie 0;
+			val money = Int.fromLarge (query_trie q Trie 0);
 		in
 				print( (Int.toString lottery_numbers) ^ " " ^ (Int.toString money) ^ "\n")
 		end
@@ -135,7 +134,7 @@ fun query_tickets [X] Trie =
 			val qq = explode(hd L);
 			val q = tl qq;
 			val lottery_numbers = getNum (hd q) Trie;
-			val money = query_trie q Trie 0;
+			val money = Int.fromLarge (query_trie q Trie 0);
 		in
 			(
 				query_tickets (tl L) Trie;
@@ -143,6 +142,8 @@ fun query_tickets [X] Trie =
 			)
 		end
 		
+
+
 fun lottery file_name =
 	let
 		val p = parse file_name
