@@ -37,9 +37,7 @@ def solve(Lin, Rin, Lout, Rout):
 				
 with open(sys.argv[1],"r") as f:
 	Q = int(next(f))
-	#print(Q)	
 	for line in f:	
 		Lin, Rin, Lout, Rout = map(int, line.split())
 		solution = solve(Lin, Rin, Lout, Rout)
 		print(solution)
-		#print(Lin, Rin, Lout, Rout)
